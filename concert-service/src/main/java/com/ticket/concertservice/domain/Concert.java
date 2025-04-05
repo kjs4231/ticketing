@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 public class Concert {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long concertId;
 
     @Column(nullable = false)
     private String title;
@@ -32,8 +32,8 @@ public class Concert {
     protected Concert() {}
 
     @Builder
-    public Concert(Long id, String title, String description, LocalDateTime dateTime, String userEmail, Long capacity) {
-        this.id = id;
+    public Concert(Long concertId, String title, String description, LocalDateTime dateTime, String userEmail, Long capacity) {
+        this.concertId = concertId;
         this.title = title;
         this.description = description;
         this.dateTime = dateTime;
