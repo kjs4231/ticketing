@@ -13,7 +13,7 @@ class ConcertResponseTest {
     void testConcertResponseFromConcert() {
         // given
         Concert concert = Concert.builder()
-                .id(1L)
+                .concertId(1L)
                 .title("콘서트 제목")
                 .description("콘서트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
@@ -26,7 +26,7 @@ class ConcertResponseTest {
 
         // then
         assertNotNull(response);
-        assertEquals(concert.getId(), response.getId());
+        assertEquals(concert.getConcertId(), response.getConcertId());
         assertEquals(concert.getTitle(), response.getTitle());
         assertEquals(concert.getDescription(), response.getDescription());
         assertEquals(concert.getDateTime(), response.getDateTime());

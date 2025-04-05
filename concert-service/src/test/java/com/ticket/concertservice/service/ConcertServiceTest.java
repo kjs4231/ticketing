@@ -52,7 +52,7 @@ class ConcertServiceTest {
                 .build();
 
         Concert savedConcert = Concert.builder()
-                .id(1L)
+                .concertId(1L)
                 .userEmail(userEmail)
                 .title(request.getTitle())
                 .description(request.getDescription())
@@ -67,7 +67,7 @@ class ConcertServiceTest {
 
         // then
         assertNotNull(response);
-        assertEquals(savedConcert.getId(), response.getId());
+        assertEquals(savedConcert.getConcertId(), response.getConcertId());
         assertEquals(request.getTitle(), response.getTitle());
     }
 
@@ -85,7 +85,7 @@ class ConcertServiceTest {
         );
 
         Concert existingConcert = Concert.builder()
-                .id(concertId)
+                .concertId(concertId)
                 .userEmail(userEmail)
                 .title("원래 제목")
                 .description("원래 설명")
@@ -112,7 +112,7 @@ class ConcertServiceTest {
         String differentUserEmail = "other@test.com";
 
         Concert existingConcert = Concert.builder()
-                .id(concertId)
+                .concertId(concertId)
                 .userEmail(creatorEmail)
                 .title("원래 제목")
                 .description("원래 설명")
@@ -143,7 +143,7 @@ class ConcertServiceTest {
         String userEmail = "test@test.com";
 
         Concert existingConcert = Concert.builder()
-                .id(concertId)
+                .concertId(concertId)
                 .userEmail(userEmail)
                 .title("테스트 콘서트")
                 .description("테스트 설명")
@@ -164,7 +164,7 @@ class ConcertServiceTest {
         // given
         Long concertId = 1L;
         Concert concert = Concert.builder()
-                .id(concertId)
+                .concertId(concertId)
                 .userEmail("test@test.com")
                 .title("콘서트 제목")
                 .description("콘서트 설명")
@@ -179,7 +179,7 @@ class ConcertServiceTest {
 
         // then
         assertNotNull(foundConcert);
-        assertEquals(concert.getId(), foundConcert.getId());
+        assertEquals(concert.getConcertId(), foundConcert.getConcertId());
         assertEquals(concert.getTitle(), foundConcert.getTitle());
     }
 
@@ -189,7 +189,7 @@ class ConcertServiceTest {
         // given
         List<Concert> concerts = Arrays.asList(
                 Concert.builder()
-                        .id(1L)
+                        .concertId(1L)
                         .userEmail("test1@test.com")
                         .title("콘서트 1")
                         .description("설명 1")
@@ -197,7 +197,7 @@ class ConcertServiceTest {
                         .capacity(100L)
                         .build(),
                 Concert.builder()
-                        .id(2L)
+                        .concertId(2L)
                         .userEmail("test2@test.com")
                         .title("콘서트 2")
                         .description("설명 2")
@@ -225,7 +225,7 @@ class ConcertServiceTest {
         String userEmail = "test@test.com";
         List<Concert> concerts = Arrays.asList(
                 Concert.builder()
-                        .id(1L)
+                        .concertId(1L)
                         .userEmail(userEmail)
                         .title("콘서트 1")
                         .description("설명 1")
@@ -233,7 +233,7 @@ class ConcertServiceTest {
                         .capacity(100L)
                         .build(),
                 Concert.builder()
-                        .id(2L)
+                        .concertId(2L)
                         .userEmail(userEmail)
                         .title("콘서트 2")
                         .description("설명 2")

@@ -46,7 +46,7 @@ class ConcertControllerTest {
 
         LocalDateTime concertDate = LocalDateTime.now().plusDays(7);
         concert = Concert.builder()
-                .id(1L)
+                .concertId(1L)
                 .title("콘서트 제목")
                 .description("콘서트 설명")
                 .dateTime(concertDate)
@@ -70,7 +70,7 @@ class ConcertControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(concertResponse.getId()))
+                .andExpect(jsonPath("$.id").value(concertResponse.getConcertId()))
                 .andExpect(jsonPath("$.title").value(concertResponse.getTitle()))
                 .andExpect(jsonPath("$.description").value(concertResponse.getDescription()))
                 .andExpect(jsonPath("$.userEmail").value(concertResponse.getUserEmail()))
@@ -83,7 +83,7 @@ class ConcertControllerTest {
 
         mockMvc.perform(get("/concerts/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(concertResponse.getId()))
+                .andExpect(jsonPath("$.id").value(concertResponse.getConcertId()))
                 .andExpect(jsonPath("$.title").value(concertResponse.getTitle()));
     }
 
@@ -94,7 +94,7 @@ class ConcertControllerTest {
 
         mockMvc.perform(get("/concerts"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(concertResponse.getId()))
+                .andExpect(jsonPath("$[0].id").value(concertResponse.getConcertId()))
                 .andExpect(jsonPath("$[0].title").value(concertResponse.getTitle()));
     }
 
@@ -104,7 +104,7 @@ class ConcertControllerTest {
                 "수정된 제목", "수정된 설명", LocalDateTime.now().plusDays(14), 200L);
 
         Concert updatedConcert = Concert.builder()
-                .id(1L)
+                .concertId(1L)
                 .title("수정된 제목")
                 .description("수정된 설명")
                 .dateTime(LocalDateTime.now().plusDays(14))
@@ -122,7 +122,7 @@ class ConcertControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(updatedResponse.getId()))
+                .andExpect(jsonPath("$.id").value(updatedResponse.getConcertId()))
                 .andExpect(jsonPath("$.title").value(updatedResponse.getTitle()));
     }
 
