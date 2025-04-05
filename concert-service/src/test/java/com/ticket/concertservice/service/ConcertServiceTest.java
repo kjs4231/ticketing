@@ -265,4 +265,67 @@ class ConcertServiceTest {
                 concertService.findConcertById(concertId)
         );
     }
+
+    @Test
+    @DisplayName("콘서트 티켓 가용성 체크 - 가능한 경우")
+    void checkAvailability_Available() {
+        // given
+        Long concertId = 1L;
+        Long quantity = 50L;
+
+        Concert concert = Concert.builder()
+                .concertId(concertId)
+                .userEmail("test@test.com")
+                .title("테스트 콘서트")
+                .description("테스트 설명")
+                .dateTime(LocalDateTime.now().plusDays(7))
+                .capacity(100L)
+                .build();
+
+        given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
+
+        // when
+        boolean isAvailable = concertService.checkAvailability(concertId, quantity);
+
+        // then
+        assertTrue(isAvailable);
+    }
+
+    @Test
+    @DisplayName("콘서트 티켓 가용성 체크 - 수량 초과로 불가능한 경우")
+    void checkAvailability_Unavailable() {
+        // given
+        Long concertId = 1L;
+        Long quantity = 150L;
+
+        Concert concert = Concert.builder()
+                .concertId(concertId)
+                .userEmail("test@test.com")
+                .title("테스트 콘서트")
+                .description("테스트 설명")
+                .dateTime(LocalDateTime.now().plusDays(7))
+                .capacity(100L)
+                .build();
+
+        given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
+
+        // when
+        boolean isAvailable = concertService.checkAvailability(concertId, quantity);
+
+        // then
+        assertFalse(isAvailable);
+    }
+
+    @Test
+    @DisplayName("콘서트 티켓 가용성 체크 - 유효하지 않은 수량")
+    void checkAvailability_InvalidQuantity() {
+        // given
+        Long concertId = 1L;
+        Long invalidQuantity = -1L;
+
+        // when & then
+        assertThrows(IllegalArgumentException.class, () ->
+                concertService.checkAvailability(concertId, invalidQuantity)
+        );
+    }
 }

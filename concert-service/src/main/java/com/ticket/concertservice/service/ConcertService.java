@@ -63,4 +63,15 @@ public class ConcertService {
 
         concertRepository.delete(concert);
     }
+
+    public boolean checkAvailability(Long concertId, Long quantity) {
+        if (quantity <= 0) {
+            throw new IllegalArgumentException("유효하지 않은 요청 수량입니다");
+        }
+
+        Concert concert = findConcertById(concertId);
+        return concert.getCapacity() >= quantity;
+    }
+
+
 }
