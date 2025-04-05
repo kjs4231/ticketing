@@ -132,4 +132,17 @@ class ConcertControllerTest {
                         .header("X-User", "test@test.com"))
                 .andExpect(status().isNoContent());
     }
+
+    @Test
+    void testGetMyConcerts() throws Exception {
+        List<Concert> concerts = Arrays.asList(concert);
+        when(concertService.findConcertsByUserEmail(anyString())).thenReturn(concerts);
+
+        mockMvc.perform(get("/concerts/my")
+                        .header("X-User", "test@test.com"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].concertId").value(concertResponse.getConcertId()))
+                .andExpect(jsonPath("$[0].title").value(concertResponse.getTitle()));
+    }
+
 }
