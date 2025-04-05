@@ -70,7 +70,7 @@ class ConcertControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.id").value(concertResponse.getConcertId()))
+                .andExpect(jsonPath("$.concertId").value(concertResponse.getConcertId()))
                 .andExpect(jsonPath("$.title").value(concertResponse.getTitle()))
                 .andExpect(jsonPath("$.description").value(concertResponse.getDescription()))
                 .andExpect(jsonPath("$.userEmail").value(concertResponse.getUserEmail()))
@@ -83,7 +83,7 @@ class ConcertControllerTest {
 
         mockMvc.perform(get("/concerts/1"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(concertResponse.getConcertId()))
+                .andExpect(jsonPath("$.concertId").value(concertResponse.getConcertId()))
                 .andExpect(jsonPath("$.title").value(concertResponse.getTitle()));
     }
 
@@ -94,7 +94,7 @@ class ConcertControllerTest {
 
         mockMvc.perform(get("/concerts"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].id").value(concertResponse.getConcertId()))
+                .andExpect(jsonPath("$[0].concertId").value(concertResponse.getConcertId()))
                 .andExpect(jsonPath("$[0].title").value(concertResponse.getTitle()));
     }
 
@@ -122,7 +122,7 @@ class ConcertControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.id").value(updatedResponse.getConcertId()))
+                .andExpect(jsonPath("$.concertId").value(updatedResponse.getConcertId()))
                 .andExpect(jsonPath("$.title").value(updatedResponse.getTitle()));
     }
 
