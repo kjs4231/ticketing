@@ -51,7 +51,7 @@ class ConcertControllerTest {
                 .description("콘서트 설명")
                 .dateTime(concertDate)
                 .userEmail("test@test.com")
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         concertResponse = ConcertResponse.from(concert);
@@ -74,7 +74,7 @@ class ConcertControllerTest {
                 .andExpect(jsonPath("$.title").value(concertResponse.getTitle()))
                 .andExpect(jsonPath("$.description").value(concertResponse.getDescription()))
                 .andExpect(jsonPath("$.userEmail").value(concertResponse.getUserEmail()))
-                .andExpect(jsonPath("$.capacity").value(concertResponse.getCapacity()));
+                .andExpect(jsonPath("$.quantity").value(concertResponse.getQuantity()));
     }
 
     @Test
@@ -109,7 +109,7 @@ class ConcertControllerTest {
                 .description("수정된 설명")
                 .dateTime(LocalDateTime.now().plusDays(14))
                 .userEmail("test@test.com")
-                .capacity(200L)
+                .quantity(200L)
                 .build();
 
         ConcertResponse updatedResponse = ConcertResponse.from(updatedConcert);

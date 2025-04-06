@@ -75,4 +75,11 @@ public class ConcertController {
                 .collect(Collectors.toList());
         return ResponseEntity.ok(responses);
     }
+
+    @GetMapping("/{concertId}/availability")
+    public boolean checkAvailability(
+            @PathVariable Long concertId,
+            @RequestParam Long quantity) {
+        return concertService.checkAvailability(concertId, quantity);
+    }
 }

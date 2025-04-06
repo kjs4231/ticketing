@@ -27,18 +27,18 @@ public class Concert {
     private String userEmail;
 
     @Column(nullable = false)
-    private Long capacity;
+    private Long quantity;
 
     protected Concert() {}
 
     @Builder
-    public Concert(Long concertId, String title, String description, LocalDateTime dateTime, String userEmail, Long capacity) {
+    public Concert(Long concertId, String title, String description, LocalDateTime dateTime, String userEmail, Long quantity) {
         this.concertId = concertId;
         this.title = title;
         this.description = description;
         this.dateTime = dateTime;
         this.userEmail = userEmail;
-        this.capacity = capacity;
+        this.quantity = quantity;
     }
 
     public static Concert of(String title, String description, LocalDateTime dateTime, String userEmail, Long capacity) {
@@ -47,7 +47,7 @@ public class Concert {
                 .description(description)
                 .dateTime(dateTime)
                 .userEmail(userEmail)
-                .capacity(capacity)
+                .quantity(capacity)
                 .build();
     }
 
@@ -55,6 +55,6 @@ public class Concert {
         this.title = request.getTitle();
         this.description = request.getDescription();
         this.dateTime = request.getDateTime();
-        this.capacity = request.getCapacity();
+        this.quantity = request.getQuantity();
     }
 }

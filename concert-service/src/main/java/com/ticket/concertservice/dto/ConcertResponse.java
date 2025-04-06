@@ -14,15 +14,15 @@ public class ConcertResponse {
     private String description;
     private LocalDateTime dateTime;
     private String userEmail;
-    private Long capacity;
+    private Long quantity;
 
-    private ConcertResponse(Long concertId, String title, String description, LocalDateTime dateTime, String userEmail, Long capacity) {
+    private ConcertResponse(Long concertId, String title, String description, LocalDateTime dateTime, String userEmail, Long quantity) {
         this.concertId = concertId;
         this.title = title;
         this.description = description;
         this.dateTime = dateTime;
         this.userEmail = userEmail;
-        this.capacity = capacity;
+        this.quantity = quantity;
     }
 
     public static ConcertResponse from(Concert concert) {
@@ -32,7 +32,7 @@ public class ConcertResponse {
                 concert.getDescription(),
                 concert.getDateTime(),
                 concert.getUserEmail(),
-                concert.getCapacity()
+                concert.getQuantity()
         );
     }
 }

@@ -48,7 +48,7 @@ class ConcertServiceTest {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .dateTime(request.getDateTime())
-                .capacity(request.getCapacity())
+                .quantity(request.getQuantity())
                 .build();
 
         Concert savedConcert = Concert.builder()
@@ -57,7 +57,7 @@ class ConcertServiceTest {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .dateTime(request.getDateTime())
-                .capacity(request.getCapacity())
+                .quantity(request.getQuantity())
                 .build();
 
         given(concertRepository.save(any(Concert.class))).willReturn(savedConcert);
@@ -90,7 +90,7 @@ class ConcertServiceTest {
                 .title("원래 제목")
                 .description("원래 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(existingConcert));
@@ -117,7 +117,7 @@ class ConcertServiceTest {
                 .title("원래 제목")
                 .description("원래 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(existingConcert));
@@ -148,7 +148,7 @@ class ConcertServiceTest {
                 .title("테스트 콘서트")
                 .description("테스트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(existingConcert));
@@ -169,7 +169,7 @@ class ConcertServiceTest {
                 .title("콘서트 제목")
                 .description("콘서트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
@@ -194,7 +194,7 @@ class ConcertServiceTest {
                         .title("콘서트 1")
                         .description("설명 1")
                         .dateTime(LocalDateTime.now().plusDays(7))
-                        .capacity(100L)
+                        .quantity(100L)
                         .build(),
                 Concert.builder()
                         .concertId(2L)
@@ -202,7 +202,7 @@ class ConcertServiceTest {
                         .title("콘서트 2")
                         .description("설명 2")
                         .dateTime(LocalDateTime.now().plusDays(14))
-                        .capacity(200L)
+                        .quantity(200L)
                         .build()
         );
 
@@ -230,7 +230,7 @@ class ConcertServiceTest {
                         .title("콘서트 1")
                         .description("설명 1")
                         .dateTime(LocalDateTime.now().plusDays(7))
-                        .capacity(100L)
+                        .quantity(100L)
                         .build(),
                 Concert.builder()
                         .concertId(2L)
@@ -238,7 +238,7 @@ class ConcertServiceTest {
                         .title("콘서트 2")
                         .description("설명 2")
                         .dateTime(LocalDateTime.now().plusDays(14))
-                        .capacity(200L)
+                        .quantity(200L)
                         .build()
         );
 
@@ -279,7 +279,7 @@ class ConcertServiceTest {
                 .title("테스트 콘서트")
                 .description("테스트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
@@ -304,7 +304,7 @@ class ConcertServiceTest {
                 .title("테스트 콘서트")
                 .description("테스트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));

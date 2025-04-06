@@ -25,7 +25,7 @@ public class ConcertService {
                 .description(request.getDescription())
                 .dateTime(request.getDateTime())
                 .userEmail(userEmail)
-                .capacity(request.getCapacity())
+                .quantity(request.getQuantity())
                 .build();
 
         concert = concertRepository.save(concert);
@@ -70,7 +70,7 @@ public class ConcertService {
         }
 
         Concert concert = findConcertById(concertId);
-        return concert.getCapacity() >= quantity;
+        return concert.getQuantity() >= quantity;
     }
 
 

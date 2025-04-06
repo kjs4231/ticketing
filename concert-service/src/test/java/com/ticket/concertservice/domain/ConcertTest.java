@@ -17,7 +17,7 @@ class ConcertTest {
         String description = "콘서트 설명";
         LocalDateTime dateTime = LocalDateTime.now().plusDays(7);
         String userEmail = "test@test.com";
-        Long capacity = 100L;
+        Long quantity = 100L;
 
         // when
         Concert concert = Concert.builder()
@@ -26,7 +26,7 @@ class ConcertTest {
                 .description(description)
                 .dateTime(dateTime)
                 .userEmail(userEmail)
-                .capacity(capacity)
+                .quantity(quantity)
                 .build();
 
         // then
@@ -36,7 +36,7 @@ class ConcertTest {
         assertEquals(description, concert.getDescription());
         assertEquals(dateTime, concert.getDateTime());
         assertEquals(userEmail, concert.getUserEmail());
-        assertEquals(capacity, concert.getCapacity());
+        assertEquals(quantity, concert.getQuantity());
     }
 
     @Test
@@ -48,7 +48,7 @@ class ConcertTest {
                 .description("기존 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
                 .userEmail("test@test.com")
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         ConcertCreateRequest updateRequest = new ConcertCreateRequest(
@@ -65,6 +65,6 @@ class ConcertTest {
         assertEquals("새로운 제목", concert.getTitle());
         assertEquals("새로운 설명", concert.getDescription());
         assertEquals(updateRequest.getDateTime(), concert.getDateTime());
-        assertEquals(updateRequest.getCapacity(), concert.getCapacity());
+        assertEquals(updateRequest.getQuantity(), concert.getQuantity());
     }
 }
