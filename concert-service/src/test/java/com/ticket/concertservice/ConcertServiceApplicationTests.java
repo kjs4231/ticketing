@@ -12,16 +12,16 @@ import org.springframework.test.context.TestPropertySource;
 @SpringBootTest
 class ConcertServiceApplicationTests {
 
-	@TestConfiguration
-	static class TestConfig {
-		@Bean
-		public RedissonClient redissonClient() {
-			Config config = new Config();
-			config.useSingleServer()
-					.setAddress("redis://localhost:6379");
-			return Redisson.create(config);
-		}
-	}
+//	@TestConfiguration
+//	static class TestConfig {
+//		@Bean
+//		public RedissonClient redissonClient() {
+//			Config config = new Config();
+//			config.useSingleServer()
+//					.setAddress("redis://localhost:6379");
+//			return Redisson.create(config);
+//		}
+//	}
 
 	@Test
 	void contextLoads() {

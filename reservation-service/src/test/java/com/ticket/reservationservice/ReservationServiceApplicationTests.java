@@ -11,16 +11,16 @@ import org.springframework.context.annotation.Bean;
 @SpringBootTest
 class ReservationServiceApplicationTests {
 
-    @TestConfiguration
-    static class TestConfig {
-        @Bean
-        public RedissonClient redissonClient() {
-            Config config = new Config();
-            config.useSingleServer()
-                    .setAddress("redis://localhost:6379");
-            return Redisson.create(config);
-        }
-    }
+//    @TestConfiguration
+//    static class TestConfig {
+//        @Bean
+//        public RedissonClient redissonClient() {
+//            Config config = new Config();
+//            config.useSingleServer()
+//                    .setAddress("redis://localhost:6379");
+//            return Redisson.create(config);
+//        }
+//    }
 
     @Test
     void contextLoads() {
