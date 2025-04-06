@@ -11,16 +11,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 class ConcertServiceTest {
@@ -31,6 +36,10 @@ class ConcertServiceTest {
     @Mock
     private ConcertRepository concertRepository;
 
+    @Mock
+    private RedissonClient redissonClient;
+
+    // [기존 테스트 코드 시작]
     @Test
     @DisplayName("콘서트 생성이 성공적으로 이루어져야 한다")
     void createConcert_Success() {
@@ -48,7 +57,7 @@ class ConcertServiceTest {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .dateTime(request.getDateTime())
-                .capacity(request.getCapacity())
+                .quantity(request.getQuantity())
                 .build();
 
         Concert savedConcert = Concert.builder()
@@ -57,7 +66,7 @@ class ConcertServiceTest {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .dateTime(request.getDateTime())
-                .capacity(request.getCapacity())
+                .quantity(request.getQuantity())
                 .build();
 
         given(concertRepository.save(any(Concert.class))).willReturn(savedConcert);
@@ -90,7 +99,7 @@ class ConcertServiceTest {
                 .title("원래 제목")
                 .description("원래 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(existingConcert));
@@ -117,7 +126,7 @@ class ConcertServiceTest {
                 .title("원래 제목")
                 .description("원래 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(existingConcert));
@@ -148,7 +157,7 @@ class ConcertServiceTest {
                 .title("테스트 콘서트")
                 .description("테스트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(existingConcert));
@@ -169,7 +178,7 @@ class ConcertServiceTest {
                 .title("콘서트 제목")
                 .description("콘서트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
@@ -194,7 +203,7 @@ class ConcertServiceTest {
                         .title("콘서트 1")
                         .description("설명 1")
                         .dateTime(LocalDateTime.now().plusDays(7))
-                        .capacity(100L)
+                        .quantity(100L)
                         .build(),
                 Concert.builder()
                         .concertId(2L)
@@ -202,7 +211,7 @@ class ConcertServiceTest {
                         .title("콘서트 2")
                         .description("설명 2")
                         .dateTime(LocalDateTime.now().plusDays(14))
-                        .capacity(200L)
+                        .quantity(200L)
                         .build()
         );
 
@@ -230,7 +239,7 @@ class ConcertServiceTest {
                         .title("콘서트 1")
                         .description("설명 1")
                         .dateTime(LocalDateTime.now().plusDays(7))
-                        .capacity(100L)
+                        .quantity(100L)
                         .build(),
                 Concert.builder()
                         .concertId(2L)
@@ -238,7 +247,7 @@ class ConcertServiceTest {
                         .title("콘서트 2")
                         .description("설명 2")
                         .dateTime(LocalDateTime.now().plusDays(14))
-                        .capacity(200L)
+                        .quantity(200L)
                         .build()
         );
 
@@ -279,7 +288,7 @@ class ConcertServiceTest {
                 .title("테스트 콘서트")
                 .description("테스트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
@@ -304,7 +313,7 @@ class ConcertServiceTest {
                 .title("테스트 콘서트")
                 .description("테스트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
@@ -327,5 +336,117 @@ class ConcertServiceTest {
         assertThrows(IllegalArgumentException.class, () ->
                 concertService.checkAvailability(concertId, invalidQuantity)
         );
+    }
+
+    @Test
+    @DisplayName("좌석 예약 - 락 획득 성공 및 예약 성공")
+    void reserveSeats_Success() throws InterruptedException {
+        // given
+        Long concertId = 1L;
+        Long quantity = 2L;
+        Concert concert = Concert.builder()
+                .concertId(concertId)
+                .quantity(10L)
+                .build();
+
+        RLock mockLock = mock(RLock.class);
+        given(mockLock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(true);
+        given(mockLock.isHeldByCurrentThread()).willReturn(true);
+        given(redissonClient.getLock(anyString())).willReturn(mockLock);
+        given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
+
+        // when
+        boolean result = concertService.reserveSeats(concertId, quantity);
+
+        // then
+        assertTrue(result);
+        assertEquals(8L, concert.getRemainingSeats());
+        verify(mockLock).unlock();
+    }
+
+    @Test
+    @DisplayName("좌석 예약 - 락 획득 실패")
+    void reserveSeats_LockFailure() throws InterruptedException {
+        // given
+        Long concertId = 1L;
+        RLock mockLock = mock(RLock.class);
+        given(mockLock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(false);
+        given(redissonClient.getLock(anyString())).willReturn(mockLock);
+
+        // when
+        boolean result = concertService.reserveSeats(concertId, 2L);
+
+        // then
+        assertFalse(result);
+        verify(mockLock, never()).unlock();
+    }
+
+
+    @Test
+    @DisplayName("좌석 예약 - 수량 부족")
+    void reserveSeats_InsufficientSeats() throws InterruptedException {
+        // given
+        Long concertId = 1L;
+        Long quantity = 15L;
+        Concert concert = Concert.builder()
+                .concertId(concertId)
+                .quantity(10L)
+                .build();
+
+        RLock mockLock = mock(RLock.class);
+        given(mockLock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(true);
+        given(mockLock.isHeldByCurrentThread()).willReturn(true);
+        given(redissonClient.getLock(anyString())).willReturn(mockLock);
+        given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
+
+        // when
+        boolean result = concertService.reserveSeats(concertId, quantity);
+
+        // then
+        assertFalse(result);
+        verify(mockLock).unlock();
+    }
+
+    @Test
+    @DisplayName("좌석 롤백 - 성공")
+    void rollbackReserveSeats_Success() throws InterruptedException {
+        // given
+        Long concertId = 1L;
+        Long quantity = 2L;
+        Concert concert = Concert.builder()
+                .concertId(concertId)
+                .quantity(8L)
+                .build();
+
+        RLock mockLock = mock(RLock.class);
+        given(mockLock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(true);
+        given(mockLock.isHeldByCurrentThread()).willReturn(true);
+        given(redissonClient.getLock(anyString())).willReturn(mockLock);
+        given(concertRepository.findById(concertId)).willReturn(Optional.of(concert));
+
+        // when
+        boolean result = concertService.rollbackReserveSeats(concertId, quantity);
+
+        // then
+        assertTrue(result);
+        assertEquals(10L, concert.getRemainingSeats());
+        verify(mockLock).unlock();
+    }
+
+        @Test
+        @DisplayName("좌석 롤백 - 락 획득 실패")
+        void rollbackReserveSeats_LockFailure() throws InterruptedException {
+            // given
+            Long concertId = 1L;
+            RLock mockLock = mock(RLock.class);
+        given(mockLock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(false);
+        given(redissonClient.getLock(anyString())).willReturn(mockLock);
+
+        // when
+        boolean result = concertService.rollbackReserveSeats(concertId, 2L);
+
+        // then
+        assertFalse(result);
+        verify(mockLock, never()).unlock();
     }
 }

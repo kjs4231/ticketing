@@ -1,18 +1,27 @@
 package com.ticket.concertservice;
 
 import org.junit.jupiter.api.Test;
+import org.redisson.Redisson;
+import org.redisson.api.RedissonClient;
+import org.redisson.config.Config;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.TestPropertySource;
 
 @SpringBootTest
-//@TestPropertySource(properties = {
-//		"spring.datasource.url=jdbc:h2:mem:testdb",
-//		"spring.datasource.driverClassName=org.h2.Driver",
-//		"spring.datasource.username=sa",
-//		"spring.datasource.password=",
-//		"spring.jpa.database-platform=org.hibernate.dialect.H2Dialect"
-//})
 class ConcertServiceApplicationTests {
+
+//	@TestConfiguration
+//	static class TestConfig {
+//		@Bean
+//		public RedissonClient redissonClient() {
+//			Config config = new Config();
+//			config.useSingleServer()
+//					.setAddress("redis://localhost:6379");
+//			return Redisson.create(config);
+//		}
+//	}
 
 	@Test
 	void contextLoads() {

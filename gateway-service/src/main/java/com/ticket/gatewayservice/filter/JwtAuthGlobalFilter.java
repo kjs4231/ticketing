@@ -23,6 +23,7 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
             "/user-service/users/login",
             "/user-service/users/signup",
             "/concert-service/concerts/all",
+            "/reservation-service/concerts/all",
             "/eureka/**"
     };
 

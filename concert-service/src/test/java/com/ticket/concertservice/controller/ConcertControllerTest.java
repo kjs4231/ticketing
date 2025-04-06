@@ -6,6 +6,7 @@ import com.ticket.concertservice.dto.ConcertCreateRequest;
 import com.ticket.concertservice.dto.ConcertResponse;
 import com.ticket.concertservice.service.ConcertService;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -51,7 +52,7 @@ class ConcertControllerTest {
                 .description("콘서트 설명")
                 .dateTime(concertDate)
                 .userEmail("test@test.com")
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         concertResponse = ConcertResponse.from(concert);
@@ -74,7 +75,7 @@ class ConcertControllerTest {
                 .andExpect(jsonPath("$.title").value(concertResponse.getTitle()))
                 .andExpect(jsonPath("$.description").value(concertResponse.getDescription()))
                 .andExpect(jsonPath("$.userEmail").value(concertResponse.getUserEmail()))
-                .andExpect(jsonPath("$.capacity").value(concertResponse.getCapacity()));
+                .andExpect(jsonPath("$.quantity").value(concertResponse.getQuantity()));
     }
 
     @Test
@@ -109,7 +110,7 @@ class ConcertControllerTest {
                 .description("수정된 설명")
                 .dateTime(LocalDateTime.now().plusDays(14))
                 .userEmail("test@test.com")
-                .capacity(200L)
+                .quantity(200L)
                 .build();
 
         ConcertResponse updatedResponse = ConcertResponse.from(updatedConcert);
@@ -145,4 +146,78 @@ class ConcertControllerTest {
                 .andExpect(jsonPath("$[0].title").value(concertResponse.getTitle()));
     }
 
+    @Test
+    @DisplayName("콘서트 좌석 가용성 체크")
+    void testCheckAvailability() throws Exception {
+        // given
+        Long concertId = 1L;
+        Long quantity = 2L;
+        when(concertService.checkAvailability(concertId, quantity)).thenReturn(true);
+
+        // when & then
+        mockMvc.perform(get("/concerts/{concertId}/availability", concertId)
+                        .param("quantity", String.valueOf(quantity)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
+    }
+
+    @Test
+    @DisplayName("콘서트 좌석 예약 - 성공")
+    void testReserveSeats_Success() throws Exception {
+        // given
+        Long concertId = 1L;
+        Long quantity = 2L;
+        when(concertService.reserveSeats(concertId, quantity)).thenReturn(true);
+
+        // when & then
+        mockMvc.perform(put("/concerts/{concertId}/reserve", concertId)
+                        .param("quantity", String.valueOf(quantity)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
+    }
+
+    @Test
+    @DisplayName("콘서트 좌석 예약 - 실패")
+    void testReserveSeats_Failure() throws Exception {
+        // given
+        Long concertId = 1L;
+        Long quantity = 2L;
+        when(concertService.reserveSeats(concertId, quantity)).thenReturn(false);
+
+        // when & then
+        mockMvc.perform(put("/concerts/{concertId}/reserve", concertId)
+                        .param("quantity", String.valueOf(quantity)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"));
+    }
+
+    @Test
+    @DisplayName("콘서트 좌석 예약 롤백 - 성공")
+    void testRollbackReserveSeats_Success() throws Exception {
+        // given
+        Long concertId = 1L;
+        Long quantity = 2L;
+        when(concertService.rollbackReserveSeats(concertId, quantity)).thenReturn(true);
+
+        // when & then
+        mockMvc.perform(put("/concerts/{concertId}/rollback", concertId)
+                        .param("quantity", String.valueOf(quantity)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("true"));
+    }
+
+    @Test
+    @DisplayName("콘서트 좌석 예약 롤백 - 실패")
+    void testRollbackReserveSeats_Failure() throws Exception {
+        // given
+        Long concertId = 1L;
+        Long quantity = 2L;
+        when(concertService.rollbackReserveSeats(concertId, quantity)).thenReturn(false);
+
+        // when & then
+        mockMvc.perform(put("/concerts/{concertId}/rollback", concertId)
+                        .param("quantity", String.valueOf(quantity)))
+                .andExpect(status().isOk())
+                .andExpect(content().string("false"));
+    }
 }

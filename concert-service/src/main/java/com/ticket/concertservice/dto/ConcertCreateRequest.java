@@ -1,6 +1,5 @@
 package com.ticket.concertservice.dto;
 
-import com.ticket.concertservice.domain.Concert;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -10,12 +9,12 @@ public class ConcertCreateRequest {
     private String title;
     private String description;
     private LocalDateTime dateTime;
-    private Long capacity;
+    private Long quantity;
 
-    public ConcertCreateRequest(String title, String description, LocalDateTime dateTime, Long capacity) {
+    public ConcertCreateRequest(String title, String description, LocalDateTime dateTime, Long quantity) {
         this.title = title;
         this.description = description;
         this.dateTime = dateTime;
-        this.capacity = capacity;
+        this.quantity = quantity;
     }
 }

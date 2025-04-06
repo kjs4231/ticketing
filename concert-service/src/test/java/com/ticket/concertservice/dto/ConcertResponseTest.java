@@ -18,7 +18,7 @@ class ConcertResponseTest {
                 .description("콘서트 설명")
                 .dateTime(LocalDateTime.now().plusDays(7))
                 .userEmail("test@test.com")
-                .capacity(100L)
+                .quantity(100L)
                 .build();
 
         // when : ConcertResponse.from() 을 통해 변환
@@ -31,7 +31,7 @@ class ConcertResponseTest {
         assertEquals(concert.getDescription(), response.getDescription());
         assertEquals(concert.getDateTime(), response.getDateTime());
         assertEquals(concert.getUserEmail(), response.getUserEmail());
-        assertEquals(concert.getCapacity(), response.getCapacity());
+        assertEquals(concert.getQuantity(), response.getQuantity());
     }
 
     @Test
@@ -43,7 +43,7 @@ class ConcertResponseTest {
                 .description(null)
                 .dateTime(null)
                 .userEmail(null)
-                .capacity(null)
+                .quantity(null)
                 .build();
 
         // when : 변환 호출
@@ -56,7 +56,7 @@ class ConcertResponseTest {
         assertNull(response.getDescription());
         assertNull(response.getDateTime());
         assertNull(response.getUserEmail());
-        assertNull(response.getCapacity());
+        assertNull(response.getQuantity());
     }
 
     @Test
@@ -68,7 +68,7 @@ class ConcertResponseTest {
                 .description("다른 콘서트 설명")
                 .dateTime(LocalDateTime.now().plusDays(14))
                 .userEmail("different@test.com")
-                .capacity(200L)
+                .quantity(200L)
                 .build();
 
         // when
@@ -81,7 +81,7 @@ class ConcertResponseTest {
         assertEquals(concert.getDescription(), response.getDescription());
         assertEquals(concert.getDateTime(), response.getDateTime());
         assertEquals(concert.getUserEmail(), response.getUserEmail());
-        assertEquals(concert.getCapacity(), response.getCapacity());
+        assertEquals(concert.getQuantity(), response.getQuantity());
     }
 
     @Test
@@ -94,7 +94,7 @@ class ConcertResponseTest {
                 .description("빌더 테스트 설명")
                 .dateTime(dateTime)
                 .userEmail("builder@test.com")
-                .capacity(300L)
+                .quantity(300L)
                 .build();
 
         // then : builder로 생성한 값이 getter를 통해서 올바르게 리턴되는지 확인
@@ -104,6 +104,6 @@ class ConcertResponseTest {
         assertEquals("빌더 테스트 설명", response.getDescription());
         assertEquals(dateTime, response.getDateTime());
         assertEquals("builder@test.com", response.getUserEmail());
-        assertEquals(300L, response.getCapacity());
+        assertEquals(300L, response.getQuantity());
     }
 }
