@@ -82,4 +82,22 @@ public class ConcertController {
             @RequestParam Long quantity) {
         return concertService.checkAvailability(concertId, quantity);
     }
+
+    @PutMapping("/{concertId}/reserve")
+    public ResponseEntity<Boolean> reserveSeats(
+            @PathVariable Long concertId,
+            @RequestParam Long quantity) {
+        log.info("좌석 예약 요청 - concertId: {}, quantity: {}", concertId, quantity);
+        boolean result = concertService.reserveSeats(concertId, quantity);
+        return ResponseEntity.ok(result);
+    }
+
+    @PutMapping("/{concertId}/rollback")
+    public ResponseEntity<Boolean> rollbackReserveSeats(
+            @PathVariable Long concertId,
+            @RequestParam Long quantity) {
+        log.info("좌석 예약 롤백 요청 - concertId: {}, quantity: {}", concertId, quantity);
+        boolean result = concertService.rollbackReserveSeats(concertId, quantity);
+        return ResponseEntity.ok(result);
+    }
 }

@@ -2,6 +2,7 @@ package com.ticket.concertservice.domain;
 
 import com.ticket.concertservice.dto.ConcertCreateRequest;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.Getter;
 import lombok.Builder;
 
@@ -27,6 +28,7 @@ public class Concert {
     private String userEmail;
 
     @Column(nullable = false)
+    @Min(value = 0, message = "좌석 수는 0 이상이어야 합니다.")
     private Long quantity;
 
     protected Concert() {}
@@ -57,4 +59,24 @@ public class Concert {
         this.dateTime = request.getDateTime();
         this.quantity = request.getQuantity();
     }
+
+    public boolean hasEnoughSeats(Long requestedQuantity) {
+        return this.quantity >= requestedQuantity;
+    }
+
+    public Long getRemainingSeats() {
+        return this.quantity;
+    }
+
+    public void reserveSeats(Long requestedQuantity) {
+        if (!hasEnoughSeats(requestedQuantity)) {
+            throw new IllegalStateException("예매 가능한 좌석 수가 부족합니다.");
+        }
+        this.quantity -= requestedQuantity;
+    }
+
+    public void addSeats(Long quantity) {
+        this.quantity += quantity;
+    }
+
 }
