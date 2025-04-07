@@ -63,7 +63,9 @@ class ReservationServiceTest {
         String userEmail = "test@example.com";
         Long quantity = 2L;
 
+
         given(concertServiceClient.reserveSeats(concertId, quantity)).willReturn(true);
+        sampleReservation.confirmReservation();
         given(reservationRepository.save(any(Reservation.class))).willReturn(sampleReservation);
 
         // when
@@ -74,7 +76,7 @@ class ReservationServiceTest {
         ReservationResponse response = future.join();
         assertThat(response).isNotNull();
         assertThat(response.getReservationId()).isEqualTo(1L);
-        assertThat(response.getStatus()).isEqualTo(ReservationStatus.PENDING);
+        assertThat(response.getStatus()).isEqualTo(ReservationStatus.CONFIRMED);
         verify(reservationRepository).save(any(Reservation.class));
     }
 
@@ -108,6 +110,7 @@ class ReservationServiceTest {
         Long quantity = 2L;
 
         given(concertServiceClient.reserveSeats(concertId, quantity)).willReturn(true);
+        sampleReservation.confirmReservation();
         given(reservationRepository.save(any(Reservation.class))).willReturn(sampleReservation);
 
         // when
@@ -116,7 +119,7 @@ class ReservationServiceTest {
         // then
         assertThat(response).isNotNull();
         assertThat(response.getReservationId()).isEqualTo(1L);
-        assertThat(response.getStatus()).isEqualTo(ReservationStatus.PENDING);
+        assertThat(response.getStatus()).isEqualTo(ReservationStatus.CONFIRMED);
         verify(reservationRepository).save(any(Reservation.class));
     }
 
