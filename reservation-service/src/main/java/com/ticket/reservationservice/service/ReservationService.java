@@ -39,59 +39,6 @@ public class ReservationService {
         }
     }
 
-//    public ReservationResponse createReservation(Long concertId, String userEmail, Long quantity) {
-//        String lockKey = "concert:" + concertId;
-//        RLock lock = redissonClient.getLock(lockKey);
-//        boolean isLockAcquired = false;
-//        boolean seatsReserved = false;
-//
-//        try {
-//            isLockAcquired = lock.tryLock(5, 10, TimeUnit.SECONDS);
-//            if (!isLockAcquired) {
-//                throw new IllegalStateException("예매를 처리할 수 없습니다. 잠시 후 다시 시도해주세요.");
-//            }
-//
-//            // 좌석 가용성 확인 이것도 굳이??? 두번체크할 필요??
-//            if (!concertServiceClient.checkAvailability(concertId, quantity)) {
-//                throw new IllegalStateException("예매 가능한 수량이 부족합니다.");
-//            }
-//
-//            // 좌석 예약
-//            seatsReserved = concertServiceClient.reserveSeats(concertId, quantity);
-//            if (!seatsReserved) {
-//                throw new IllegalStateException("좌석 예매에 실패했습니다.");
-//            }
-//
-//            try { // 굳이?? 보여주기식 x
-//                // 예매 정보 생성
-//                Reservation reservation = Reservation.createReservation(concertId, userEmail, quantity);
-//                Reservation savedReservation = reservationRepository.save(reservation);
-//                log.info("예매 생성 완료 - ID: {}", savedReservation.getReservationId());
-//                return new ReservationResponse(savedReservation);
-//
-//            } catch (Exception e) {
-//                // 예매 정보 생성 실패시 좌석 롤백
-//                if (seatsReserved) {
-//                    boolean rollbackSuccess = concertServiceClient.rollbackReserveSeats(concertId, quantity);
-//                    if (!rollbackSuccess) {
-//                        log.error("좌석 롤백 실패 - concertId: {}, quantity: {}", concertId, quantity);
-//                    }
-//                }
-//                throw e;
-//            }
-//
-//        } catch (InterruptedException e) {
-//            Thread.currentThread().interrupt();
-//            log.error("락 획득 중 인터럽트 발생 - concertId: {}", concertId, e);
-//            throw new IllegalStateException("예매 처리 중 오류가 발생했습니다.");
-//        } finally {
-//            if (isLockAcquired && lock.isHeldByCurrentThread()) {
-//                lock.unlock();
-//                log.info("락 해제 concertId: {}", concertId);
-//            }
-//        }
-//    }
-
     public ReservationResponse createReservation(Long concertId, String userEmail, Long quantity) {
         boolean seatsReserved = false;
         try {
