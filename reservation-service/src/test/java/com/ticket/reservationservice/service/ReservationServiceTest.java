@@ -38,10 +38,6 @@ class ReservationServiceTest {
     private ReservationRepository reservationRepository;
     @Mock
     private ConcertServiceClient concertServiceClient;
-    @Mock
-    private RedissonClient redissonClient;
-    @Mock
-    private RLock lock;
 
     @InjectMocks
     private ReservationService reservationService;
@@ -61,22 +57,18 @@ class ReservationServiceTest {
 
     @Test
     @DisplayName("비동기 예매 생성 성공")
-    void createReservationAsync_Success() throws InterruptedException {
+    void createReservationAsync_Success() {
         // given
         Long concertId = 100L;
         String userEmail = "test@example.com";
         Long quantity = 2L;
 
-        when(redissonClient.getLock(anyString())).thenReturn(lock);
-        given(lock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(true);
-        // 락 해제를 위해 현재 스레드가 락을 보유했다고 명시
-        given(lock.isHeldByCurrentThread()).willReturn(true);
-        given(concertServiceClient.checkAvailability(concertId, quantity)).willReturn(true);
         given(concertServiceClient.reserveSeats(concertId, quantity)).willReturn(true);
         given(reservationRepository.save(any(Reservation.class))).willReturn(sampleReservation);
 
         // when
-        CompletableFuture<ReservationResponse> future = reservationService.createReservationAsync(concertId, userEmail, quantity);
+        CompletableFuture<ReservationResponse> future =
+                reservationService.createReservationAsync(concertId, userEmail, quantity);
 
         // then
         ReservationResponse response = future.join();
@@ -84,49 +76,37 @@ class ReservationServiceTest {
         assertThat(response.getReservationId()).isEqualTo(1L);
         assertThat(response.getStatus()).isEqualTo(ReservationStatus.PENDING);
         verify(reservationRepository).save(any(Reservation.class));
-        verify(lock).unlock();
     }
 
     @Test
-    @DisplayName("비동기 예매 생성 실패 - 좌석 부족")
-    void createReservationAsync_Failure_NotAvailable() throws InterruptedException {
-        // given
-        Long concertId = 100L;
-        String userEmail = "test@example.com";
-        Long quantity = 100L;
-
-        when(redissonClient.getLock(anyString())).thenReturn(lock);
-        when(lock.isHeldByCurrentThread()).thenReturn(true);
-        given(lock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(true);
-        given(concertServiceClient.checkAvailability(concertId, quantity)).willReturn(false);
-
-        // when
-        CompletableFuture<ReservationResponse> future = reservationService.createReservationAsync(concertId, userEmail, quantity);
-
-        // then
-        assertThatThrownBy(future::join)
-                .hasCauseInstanceOf(IllegalStateException.class)
-                .hasMessageContaining("예매 가능한 수량이 부족합니다");
-
-        verify(reservationRepository, never()).save(any(Reservation.class));
-        verify(lock).tryLock(anyLong(), anyLong(), any(TimeUnit.class));
-        verify(lock).isHeldByCurrentThread();
-        verify(lock).unlock();
-    }
-
-    @Test
-    @DisplayName("예매 생성 성공")
-    void createReservation_Success() throws InterruptedException {
+    @DisplayName("비동기 예매 생성 실패 - 좌석 예약 실패")
+    void createReservationAsync_Failure() {
         // given
         Long concertId = 100L;
         String userEmail = "test@example.com";
         Long quantity = 2L;
 
-        when(redissonClient.getLock(anyString())).thenReturn(lock);
-        given(lock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(true);
-        // 락 보유 상태를 명시적으로 설정
-        given(lock.isHeldByCurrentThread()).willReturn(true);
-        given(concertServiceClient.checkAvailability(concertId, quantity)).willReturn(true);
+        given(concertServiceClient.reserveSeats(concertId, quantity)).willReturn(false);
+
+        // when
+        CompletableFuture<ReservationResponse> future =
+                reservationService.createReservationAsync(concertId, userEmail, quantity);
+
+        // then
+        assertThatThrownBy(future::join)
+                .hasCauseInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("좌석 예매에 실패했습니다");
+        verify(reservationRepository, never()).save(any(Reservation.class));
+    }
+
+    @Test
+    @DisplayName("예매 생성 성공")
+    void createReservation_Success() {
+        // given
+        Long concertId = 100L;
+        String userEmail = "test@example.com";
+        Long quantity = 2L;
+
         given(concertServiceClient.reserveSeats(concertId, quantity)).willReturn(true);
         given(reservationRepository.save(any(Reservation.class))).willReturn(sampleReservation);
 
@@ -138,43 +118,16 @@ class ReservationServiceTest {
         assertThat(response.getReservationId()).isEqualTo(1L);
         assertThat(response.getStatus()).isEqualTo(ReservationStatus.PENDING);
         verify(reservationRepository).save(any(Reservation.class));
-        verify(lock).unlock();
-    }
-
-    @Test
-    @DisplayName("예매 생성 실패 - 락 획득 실패")
-    void createReservation_FailToAcquireLock() throws InterruptedException {
-        // given
-        Long concertId = 100L;
-        String userEmail = "test@example.com";
-        Long quantity = 2L;
-
-        when(redissonClient.getLock(anyString())).thenReturn(lock);
-        given(lock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(false);
-
-        // when & then
-        assertThatThrownBy(() ->
-                reservationService.createReservation(concertId, userEmail, quantity)
-        )
-                .isInstanceOf(IllegalStateException.class)
-                .hasMessage("예매를 처리할 수 없습니다. 잠시 후 다시 시도해주세요.");
-
-        verify(reservationRepository, never()).save(any(Reservation.class));
     }
 
     @Test
     @DisplayName("예매 생성 실패 - 좌석 예약 실패")
-    void createReservation_FailToReserveSeats() throws InterruptedException {
+    void createReservation_FailToReserveSeats() {
         // given
         Long concertId = 100L;
         String userEmail = "test@example.com";
         Long quantity = 2L;
 
-        when(redissonClient.getLock(anyString())).thenReturn(lock);
-        given(lock.tryLock(anyLong(), anyLong(), any(TimeUnit.class))).willReturn(true);
-        // 락 보유 상태를 명시적으로 설정
-        given(lock.isHeldByCurrentThread()).willReturn(true);
-        given(concertServiceClient.checkAvailability(concertId, quantity)).willReturn(true);
         given(concertServiceClient.reserveSeats(concertId, quantity)).willReturn(false);
 
         // when & then
@@ -185,7 +138,6 @@ class ReservationServiceTest {
                 .hasMessage("좌석 예매에 실패했습니다.");
 
         verify(reservationRepository, never()).save(any(Reservation.class));
-        verify(lock).unlock();
     }
 
     @Test
