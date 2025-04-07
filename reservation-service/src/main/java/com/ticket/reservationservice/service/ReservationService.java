@@ -50,6 +50,7 @@ public class ReservationService {
 
             // 예매 정보 생성
             Reservation reservation = Reservation.createReservation(concertId, userEmail, quantity);
+            reservation.confirmReservation();
             return new ReservationResponse(reservationRepository.save(reservation));
 
         } catch (Exception e) {

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/reservations")
@@ -20,13 +21,14 @@ public class ReservationController {
     }
 
     @PostMapping
-    public ResponseEntity<ReservationResponse> createReservation(
+    public CompletableFuture<ResponseEntity<ReservationResponse>> createReservation(
             @RequestBody ReservationRequest request,
             @RequestHeader("X-User") String userEmail) {
-        ReservationResponse response = reservationService.createReservation(
-                request.getConcertId(), userEmail, request.getQuantity());
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+        return reservationService.createReservationAsync(
+                        request.getConcertId(), userEmail, request.getQuantity())
+                .thenApply(response -> ResponseEntity.status(HttpStatus.CREATED).body(response));
     }
+
 
 
     @DeleteMapping("/{reservationId}")
