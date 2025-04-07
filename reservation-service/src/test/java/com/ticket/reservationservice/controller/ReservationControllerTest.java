@@ -13,11 +13,13 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
@@ -61,13 +63,17 @@ class ReservationControllerTest {
         request.setConcertId(1L);
         request.setQuantity(2L);
 
-        when(reservationService.createReservation(anyLong(), anyString(), anyLong()))
-                .thenReturn(reservationResponse);
+        when(reservationService.createReservationAsync(anyLong(), anyString(), anyLong()))
+                .thenReturn(CompletableFuture.completedFuture(reservationResponse));
 
-        mockMvc.perform(post("/reservations")
+        MvcResult mvcResult = mockMvc.perform(post("/reservations")
                         .header("X-User", "test@test.com")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
+                .andExpect(request().asyncStarted())
+                .andReturn();
+
+        mockMvc.perform(asyncDispatch(mvcResult))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.reservationId").value(reservationResponse.getReservationId()))
                 .andExpect(jsonPath("$.concertId").value(reservationResponse.getConcertId()))

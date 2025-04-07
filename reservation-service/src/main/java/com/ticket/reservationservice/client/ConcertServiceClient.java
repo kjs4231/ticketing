@@ -15,9 +15,9 @@ public interface ConcertServiceClient {
     boolean checkAvailability(@PathVariable("concertId") Long concertId,
                               @RequestParam("quantity") Long quantity);
 
-    @PutMapping("/api/concerts/{concertId}/reserve")
+    @PutMapping("/concerts/{concertId}/reserve")
     boolean reserveSeats(@PathVariable Long concertId, @RequestParam Long quantity);
 
-    @PutMapping("/api/concerts/{concertId}/rollback")
+    @PutMapping("/concerts/{concertId}/rollback")
     boolean rollbackReserveSeats(@PathVariable Long concertId, @RequestParam Long quantity);
 }
